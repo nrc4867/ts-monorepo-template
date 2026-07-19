@@ -4,6 +4,9 @@ pnpm workspace + Turborepo monorepo. Libraries live in `packages/*`, deployable 
 `apps/*`. Each has its own `package.json` and a `tsconfig.json` that extends the root
 `tsconfig.base.json`.
 
+`docker-compose.yml` is for stateful local infra only (a database, if/when one is added)
+— the apps themselves always run natively via `pnpm dev`, not in a container.
+
 ## Commands
 
 Run from the repo root (Turbo fans these out to every workspace package):
@@ -58,10 +61,15 @@ the bundler/type-checker to resolve and don't hide circular dependencies.
 
 ## Logging and imports
 
-- `console.log`/`console.info`/`console.debug` are lint errors (`no-console`).
-  `console.warn`/`console.error` are allowed.
-- Import order/grouping is auto-fixed by `eslint-plugin-simple-import-sort` — don't
-  hand-arrange imports; run `pnpm lint:fix` and let it sort them.
+- Everywhere except `apps/server`: `console.log`/`console.info`/`console.debug` are lint
+  errors (`no-console`); `console.warn`/`console.error` are allowed (e.g.
+  `packages/error-reporting`'s intentional `console.error` stub).
+- **`apps/server` specifically**: no `console.*` at all, not even `warn`/`error` — use
+  `logger` from `src/logger.ts` (`pino`) instead. `logger.info`/`warn`/`error`/`debug` are
+  all real, structured log levels; `pino-pretty` colorizes output outside
+  `NODE_ENV=production`. Import order/grouping is auto-fixed by
+  `eslint-plugin-simple-import-sort` — don't hand-arrange imports; run `pnpm lint:fix` and
+  let it sort them.
 
 ## Error reporting
 

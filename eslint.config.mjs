@@ -92,5 +92,13 @@ export default tseslint.config(
       react: { version: 'detect' },
     },
   },
+  {
+    files: ['apps/server/**/*.ts'],
+    rules: {
+      // No console.* at all here (not even warn/error) — apps/server has a
+      // real logger (src/logger.ts, pino); use that instead.
+      'no-console': 'error',
+    },
+  },
   prettierConfig,
 );

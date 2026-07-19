@@ -47,27 +47,33 @@ pnpm --filter @project/server dev
 `apps/server/.env.example` to `apps/server/.env` to override defaults like `PORT` locally.
 `.env` is gitignored; `.env.example` is the checked-in reference for what's expected.
 
-## Scaffolding a new package or app
+## Local infrastructure (`docker-compose.yml`)
+
+`docker-compose.yml` is for stateful dependencies only (Postgres, Redis, etc.) — the apps
+themselves always run natively via `pnpm dev`, not in a container, since hot-reload and
+debugging both work better outside Docker. The file ships commented out since there's no
+real dependency yet; uncomment/adjust the example when you add one.
+
+`docker compose up` also auto-merges a gitignored `docker-compose.override.yml` if you
+create one (per-developer local tweaks). For a prod deployment, layer an explicit file
+instead: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up`.
+
+## Scaffolding a new package
 
 ```sh
-pnpm gen
+pnpm gen package
 ```
 
-Runs `turbo gen`, which prompts for a generator and a name:
+Runs `turbo gen`'s `package` generator: prompts for a kebab-case name, scaffolds a new
+library in `packages/<name>` (mirrors `packages/example`), adds it to the root
+`tsconfig.json` `references` array automatically, and reminds you to run `pnpm install`
+afterward to link the new workspace member. The generator definition lives in
+`turbo/generators/config.ts`; the files it copies are in `turbo/generators/templates/`.
 
-- **`package`** — a new library in `packages/<name>` (mirrors `packages/example`)
-- **`app-server`** — a new Express + Zod backend in `apps/<name>` (mirrors `apps/server`)
-
-You can also skip the generator picker: `pnpm gen package` or `pnpm gen app-server`.
-
-Either one scaffolds the files, adds the new project to the root `tsconfig.json`
-`references` array automatically, and reminds you to run `pnpm install` afterward to link
-the new workspace member. The generator definitions live in `turbo/generators/config.ts`;
-the files they copy are in `turbo/generators/templates/`.
-
-There's no `app-web` generator yet, since most projects only need the one `apps/web` — add
-one following the same pattern in `turbo/generators/config.ts` if you find yourself
-needing a second frontend repeatedly.
+There's no `app-web` or `app-server` generator — most projects only ever need the one
+`apps/web` and one `apps/server` that already exist, unlike packages (utils, schemas, a
+client SDK, etc.), which you genuinely create more of over a project's life. Copy
+`apps/web` or `apps/server` by hand (see below) in the rare case you need a second app.
 
 ### Adding one by hand instead
 

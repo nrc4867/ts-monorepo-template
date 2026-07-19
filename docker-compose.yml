@@ -1,0 +1,31 @@
+# Local development infrastructure only. The apps themselves (apps/web,
+# apps/server) run natively via `pnpm dev` — hot-reload (tsx watch / Vite HMR)
+# and debugging both work better outside a container, and you already have
+# Node/pnpm installed since this is the same monorepo. This file exists for
+# stateful dependencies (databases, caches, queues) that are genuinely
+# annoying to install/version-match locally, kept in containers instead.
+#
+# Multi-file layering: `docker compose up` with no -f flag also auto-merges
+# a docker-compose.override.yml if one exists (handy for per-developer local
+# tweaks, gitignored). For a prod deployment, layer an explicit override
+# instead: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up`.
+# Compose also supports a top-level `include:` key for pulling in another
+# compose file wholesale, if that fits better than merging/overriding.
+#
+# Uncomment and adjust as you add real dependencies. Example (Postgres):
+#
+# services:
+#   postgres:
+#     image: postgres:17-alpine
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: postgres
+#       POSTGRES_DB: app
+#     ports:
+#       - '5432:5432'
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+#
+# volumes:
+#   postgres-data:
