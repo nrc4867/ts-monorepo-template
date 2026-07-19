@@ -143,6 +143,17 @@ each app's `tsconfig.json`/`tsconfig.app.json`, plus `resolve.alias` in `apps/we
 Not mandatory for adjacent files in the same directory (`./env.js` is fine) — reach for
 `@/` when importing across subdirectories once an app grows past a flat `src/`.
 
+## Dependency version ceilings
+
+`typescript` is pinned to the 6.x line and `eslint` to the 9.x line — not an oversight,
+a hard peer-dependency wall. `typescript-eslint@8.x` (the latest release) only supports
+`typescript <6.1.0`, and `eslint-plugin-react`/`eslint-plugin-jsx-a11y` (also latest)
+only support `eslint ^9.x`. Bumping either past those ceilings breaks linting outright
+(confirmed: TS 7 crashes typescript-eslint's internals; ESLint 10 crashes
+`eslint-plugin-react`'s `react/display-name` rule). Check whether those plugins have
+caught up before trying again — don't just bump the version because Dependabot suggests
+it.
+
 ## Code organization
 
 - One component, class, or logical module per file.

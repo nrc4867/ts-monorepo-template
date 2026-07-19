@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -20,7 +20,17 @@ function addTsconfigReference(relativePath: string): string {
     // JSON.stringify's formatting doesn't match Prettier's (it always
     // expands objects); reformat immediately instead of leaving it for the
     // pre-commit hook, so `pnpm format:check` passes right after `pnpm gen`.
-    execFileSync('npx', ['prettier', '--write', tsconfigPath], { stdio: 'ignore', shell: true });
+    // Resolve the local binary directly rather than going through npx.
+    // execSync (a single quoted command string) is used instead of
+    // execFileSync with an args array + shell:true, which Node deprecated
+    // (DEP0190) precisely because that combination doesn't escape args.
+    const prettierBin = join(
+      process.cwd(),
+      'node_modules',
+      '.bin',
+      process.platform === 'win32' ? 'prettier.cmd' : 'prettier',
+    );
+    execSync(`"${prettierBin}" --write "${tsconfigPath}"`, { stdio: 'ignore' });
     return `Added "${relativePath}" to tsconfig.json references`;
   }
 
