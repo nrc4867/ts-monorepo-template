@@ -8,6 +8,7 @@ A pnpm + Turborepo TypeScript monorepo template with strict TS, ESLint (typescri
 npx degit <your-org>/ts-monorepo-template new-project
 cd new-project
 pnpm install
+pnpm build
 pnpm dev
 ```
 
@@ -46,6 +47,13 @@ pnpm --filter @project/server dev
 `apps/server` reads config from environment variables (see `src/env.ts`) — copy
 `apps/server/.env.example` to `apps/server/.env` to override defaults like `PORT` locally.
 `.env` is gitignored; `.env.example` is the checked-in reference for what's expected.
+
+**If `pnpm dev` fails with `Failed to resolve import "@project/error-reporting"`** (or any
+other workspace package): that package hasn't been built yet. `apps/web`/`apps/server`
+import workspace libraries via their `package.json` `main`/`types` fields, which point at
+`dist/` — Vite/Node can't resolve the import until that exists. Run `pnpm build` once
+(already in the quickstart above) to fix it; you'll hit this again any time you `rm -rf`
+a package's `dist/` without rebuilding, or run `pnpm dev` before ever running `pnpm build`.
 
 ## Local infrastructure (`docker-compose.yml`)
 
