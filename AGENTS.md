@@ -108,6 +108,24 @@ every push to `main` and every PR. This is the actual gate — the local Husky p
 hook only catches issues before they're committed on a machine that has hooks installed;
 CI is what actually blocks a bad merge.
 
+## Environment variables
+
+Never read `process.env`/`import.meta.env` directly outside `src/env.ts` — every app has
+one, and it's the single source of truth for that app's config:
+
+- **`apps/server/src/env.ts`**: loads `.env` via `dotenv` (`config({ quiet: true })`, a
+  no-op if the file doesn't exist), then parses `process.env` through a Zod schema and
+  exports the validated result as `env`. Add a new var by adding it to the schema, then
+  import `{ env }` wherever it's needed instead of touching `process.env`.
+- **`apps/web/src/env.ts`**: parses `import.meta.env` through a Zod schema. Vite only
+  exposes `VITE_`-prefixed keys to client code, and only loads `.env` files itself (no
+  `dotenv` needed) — Vite-specific built-ins like `MODE` are always present with zero
+  setup.
+- Both fail fast: an invalid or missing required var throws at import time (Zod's
+  `.parse`, not `.safeParse`) rather than surfacing as an obscure runtime bug later.
+- `apps/server/.env.example` documents every var the schema expects — keep it in sync
+  when the schema changes. `.env` itself is gitignored.
+
 ## Code organization
 
 - One component, class, or logical module per file.

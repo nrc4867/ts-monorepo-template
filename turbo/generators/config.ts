@@ -27,6 +27,15 @@ function addTsconfigReference(relativePath: string): string {
   return `tsconfig.json already references "${relativePath}"`;
 }
 
+function copyEnvExample(destinationDir: string): string {
+  // Glob-based addMany skips dotfiles by default, so .env.example is copied
+  // explicitly here rather than relying on the templateFiles glob to find it.
+  const source = join(__dirname, 'templates/app-server.env.example');
+  const dest = join(process.cwd(), destinationDir, '.env.example');
+  writeFileSync(dest, readFileSync(source, 'utf8'));
+  return `Copied .env.example to ${destinationDir}`;
+}
+
 function nameValidator(input: string): boolean | string {
   return /^[a-z][a-z0-9-]*$/.test(input) || 'Use lowercase kebab-case, e.g. date-utils';
 }
@@ -71,6 +80,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         base: 'templates/app-server',
         templateFiles: 'templates/app-server/**',
       },
+      (answers) => copyEnvExample(`apps/${(answers as { name: string }).name}`),
       (answers) => addTsconfigReference(`apps/${(answers as { name: string }).name}`),
       () => 'Run `pnpm install` to link the new workspace member.',
     ],

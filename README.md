@@ -25,6 +25,28 @@ pnpm dev
 - **`.editorconfig`** / **`.gitattributes`** — consistent indentation and LF line endings
 - **`.nvmrc`** — pins Node 20
 
+## Running the apps
+
+```sh
+pnpm dev
+```
+
+Runs every app's `dev` script concurrently via Turborepo: `apps/web` on
+[http://localhost:5173](http://localhost:5173) (Vite) and `apps/server` on
+[http://localhost:3000](http://localhost:3000) (`tsx watch`, no build step). Check
+`apps/server`'s `GET /health` at <http://localhost:3000/health> to confirm it's up.
+
+To run just one:
+
+```sh
+pnpm --filter @project/web dev
+pnpm --filter @project/server dev
+```
+
+`apps/server` reads config from environment variables (see `src/env.ts`) — copy
+`apps/server/.env.example` to `apps/server/.env` to override defaults like `PORT` locally.
+`.env` is gitignored; `.env.example` is the checked-in reference for what's expected.
+
 ## Scaffolding a new package or app
 
 ```sh
