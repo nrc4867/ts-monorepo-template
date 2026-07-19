@@ -11,3 +11,6 @@ Each app needs:
 
 If an app is a React app under `apps/web`, ESLint's React/hooks rules
 (`eslint.config.mjs`) apply automatically — no extra setup needed.
+
+`web/` is a working Vite + React + TS reference app (build/typecheck/lint all pass) —
+copy it as a starting point for other apps, or edit it in place if you only need one.

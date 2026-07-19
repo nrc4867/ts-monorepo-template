@@ -21,7 +21,13 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          // Vite/build config files aren't part of any app's tsconfig `include` —
+          // lint them in an isolated default project rather than adding a
+          // tsconfig just for config files. Add new entries here as needed;
+          // typescript-eslint caps this at a handful of files for perf reasons.
+          allowDefaultProject: ['apps/web/vite.config.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
