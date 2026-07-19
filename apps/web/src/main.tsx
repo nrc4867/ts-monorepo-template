@@ -3,8 +3,8 @@ import './i18n.js';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { App } from './app.js';
-import { ErrorBoundary } from './error-boundary.js';
+import { App } from './components/app/index.js';
+import { ErrorBoundary } from './components/error-boundary/index.js';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

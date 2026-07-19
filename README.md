@@ -21,8 +21,11 @@ pnpm dev
 - **ESLint** (`eslint.config.mjs`) — flat config, `typescript-eslint` strictTypeChecked,
   React/hooks rules scoped to `apps/web/**`, `eslint-config-prettier` to defer formatting to Prettier
 - **Prettier** (`.prettierrc.json`, `.prettierignore`)
+- **Stylelint** (`stylelint.config.mjs`, `.stylelintignore`) — `stylelint-config-standard-scss`
+  plus a `c-`/`m-` class-naming rule; see "Components and styling" below
 - **Husky + lint-staged** — pre-commit hook runs `eslint --fix` + `prettier --write` on staged files
-- **Vitest** (`vitest.config.ts`) — picks up `*.test.ts` under `apps/*/src` and `packages/*/src`
+- **Vitest** (`vitest.config.ts`) — picks up `*.test.{ts,tsx}` under `apps/*/src` and
+  `packages/*/src`
 - **`.editorconfig`** / **`.gitattributes`** — consistent indentation and LF line endings
 - **`.nvmrc`** — pins Node 22 (pnpm 11 requires Node ≥ 22.13)
 
@@ -73,7 +76,7 @@ pnpm gen package
 ```
 
 Runs `turbo gen`'s `package` generator: prompts for a kebab-case name, scaffolds a new
-library in `packages/<name>` (mirrors `packages/example`), adds it to the root
+library in `packages/<name>` (mirrors `packages/api-contract`), adds it to the root
 `tsconfig.json` `references` array automatically, and reminds you to run `pnpm install`
 afterward to link the new workspace member. The generator definition lives in
 `turbo/generators/config.ts`; the files it copies are in `turbo/generators/templates/`.
@@ -90,6 +93,18 @@ client SDK, etc.), which you genuinely create more of over a project's life. Cop
 2. Add it to the root `tsconfig.json` `references` array so `tsc -b` picks it up.
 3. Run `pnpm install` to link the workspace.
 
-`packages/example`, `apps/web`, and `apps/server` are working reference projects
-(build/typecheck/lint/test all pass out of the box) — copy one as a starting point, or
-delete it once you've added real projects.
+`packages/api-contract`, `packages/ui-components`, `apps/web`, and `apps/server` are
+working reference projects (build/typecheck/lint/test all pass out of the box) — copy one
+as a starting point, or delete it once you've added real projects.
+
+## Components and styling
+
+`apps/web` and `packages/ui-components` share one convention: every component gets its own
+directory under `src/components/<name>/` — the component, a barrel `index.ts`, a
+`__specs__/` subdirectory for its test, and a `style/` subdirectory for its `.module.scss`.
+Classes are prefixed `c-` (component) or `m-`
+(modifier), enforced by `stylelint` (`pnpm lint:styles`) so a cross-component style override
+is an obvious, lintable violation rather than something you'd only catch in review. See
+"Components and styling (React apps)" in `AGENTS.md` for the full rules, and
+`packages/ui-components`'s README for the extra constraints a _publishable_ component
+package carries (no i18n, no env vars, `react`/`react-dom` as peer deps).

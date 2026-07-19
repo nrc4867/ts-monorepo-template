@@ -1,9 +1,5 @@
+import { healthResponseSchema } from '@project/api-contract';
 import express, { type Express } from 'express';
-import { z } from 'zod';
-
-const healthResponseSchema = z.object({
-  status: z.literal('ok'),
-});
 
 export function createApp(): Express {
   const app = express();

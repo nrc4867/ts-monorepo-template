@@ -5,8 +5,9 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --concurrency 15",
-    "lint": "turbo run lint && eslint vitest.config.ts turbo/generators/config.ts",
-    "lint:fix": "turbo run lint -- --fix && eslint --fix vitest.config.ts turbo/generators/config.ts",
+    "lint": "turbo run lint && eslint vitest.config.ts turbo/generators/config.ts && pnpm lint:styles",
+    "lint:fix": "turbo run lint -- --fix && eslint --fix vitest.config.ts turbo/generators/config.ts && pnpm lint:styles -- --fix",
+    "lint:styles": "stylelint '**/*.{css,scss}'",
     "typecheck": "turbo run typecheck && tsc --noEmit -p turbo/generators/tsconfig.json",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -32,6 +33,8 @@
     "jsdom": "^29.1.1",
     "lint-staged": "^17.1.0",
     "prettier": "^3.9.5",
+    "stylelint": "^17.14.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "turbo": "^2.10.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.64.0",
@@ -45,6 +48,9 @@
     "*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write"
+    ],
+    "*.{css,scss}": [
+      "stylelint --fix"
     ],
     "*.{js,mjs,cjs,json,md,scss,css,yaml,yml,html}": [
       "prettier --write"

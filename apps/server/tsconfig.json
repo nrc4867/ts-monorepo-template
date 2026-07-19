@@ -8,5 +8,8 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "../../packages/error-reporting" }]
+  "references": [
+    { "path": "../../packages/api-contract" },
+    { "path": "../../packages/error-reporting" }
+  ]
 }

@@ -1,0 +1,21 @@
+.c-button {
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.5rem 1rem;
+
+  // Modifiers nest under the component class they modify, rather than
+  // living as sibling top-level rules — `&.m-primary` only ever applies
+  // alongside `.c-button` (see button.tsx, which always applies both
+  // classes together), so the SCSS mirrors that pairing instead of hiding it.
+  &.m-primary {
+    background-color: #2563eb;
+    color: #fff;
+  }
+
+  &.m-secondary {
+    background-color: #e5e7eb;
+    color: #111827;
+  }
+}

@@ -1,4 +1,4 @@
-.wrapper {
+.c-app {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
@@ -7,6 +7,6 @@
   font-family: system-ui, sans-serif;
 }
 
-.title {
+.c-app-title {
   font-size: 1.5rem;
 }

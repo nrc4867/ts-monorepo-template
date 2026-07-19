@@ -21,7 +21,7 @@ Run from the repo root (Turbo fans these out to every workspace package):
 ## Adding a package or app
 
 1. Create `packages/<name>` (or `apps/<name>`) with a `package.json` (`build`/`typecheck`/
-   `lint`/`clean` scripts matching `packages/example`) and a `tsconfig.json` extending
+   `lint`/`clean` scripts matching `packages/api-contract`) and a `tsconfig.json` extending
    `../../tsconfig.base.json`.
 2. Add `{ "path": "packages/<name>" }` to the root `tsconfig.json` `references` array.
 3. Run `pnpm install` to link the new workspace member.
@@ -39,19 +39,61 @@ files (e.g. `vite.config.ts`, `postcss.config.mjs`) and framework-mandated files
 covered by the rule at all since it only targets code extensions. If a new framework
 forces another exception, add it to that `ignores` list rather than disabling the rule.
 
-## Styling (React apps)
+## Components and styling (React apps)
 
-- No inline styles (`style={{...}}`) and no CSS-in-JS. Use **CSS Modules**, colocated with
-  the component: `component-name.tsx` + `component-name.module.css` in the same directory.
-- Import as `styles` and reference classes via `styles.foo` — e.g.
-  `import styles from './component-name.module.css'` then `<div className={styles.wrapper}>`.
-- Shared/global styles (resets, tokens, layout shells) can live outside a component's
-  module, but anything component-specific stays in that component's own `.module.css`.
-- Enforced by `react/forbid-dom-props` (`eslint.config.mjs`, `apps/web/**` only) — it's an
-  `error`, not a warning, so it blocks commits/CI. Genuinely computed/dynamic styles are
-  still possible via an explicit `// eslint-disable-next-line react/forbid-dom-props`
-  comment on that line — the point is to make each exception visible in review, not to
-  forbid inline styles outright.
+- **One directory per component.** `src/components/<name>/` holds everything for that
+  component:
+  ```
+  src/components/<name>/
+    <name>.tsx
+    index.ts            # export * from './<name>.js'
+    __specs__/
+      <name>.test.tsx
+    style/
+      <name>.module.scss
+  ```
+  Tests live in a `__specs__/` subdirectory (not colocated next to the component file) and
+  styles live in a `style/` subdirectory, each imported with a relative path
+  (`./style/<name>.module.scss` from the component, `../<name>.js` from the test). A
+  component with distinct sub-parts can have its own further subdirectories under that same
+  directory — keep the whole thing self-contained rather than spreading pieces across
+  `src/`.
+  This only applies to components (`src/components/**`) — plain modules elsewhere
+  (`src/env.ts`, `src/lib/health-client.ts`, etc.) keep the simpler colocated
+  `<name>.ts` + `<name>.test.ts` pattern used throughout the rest of the repo.
+- No inline styles (`style={{...}}`) and no CSS-in-JS. Use **SCSS Modules** (`.module.scss`,
+  not plain `.module.css` — `sass` is a devDependency of `apps/web` and any component
+  package specifically so nesting/variables work).
+- **Class naming**: every class is either a component class, prefixed `c-` (e.g. `c-button`,
+  or `c-button-icon` for a sub-part), or a modifier, prefixed `m-` (e.g. `m-primary`),
+  applied alongside a `c-` class rather than replacing it. Enforced by `stylelint`
+  (`stylelint.config.mjs`'s `selector-class-pattern`) — a hard error, same severity as the
+  ESLint rules below.
+- **Modifiers nest under the component rule they modify** — `.c-button { &.m-primary { ... } }`,
+  not `.c-button { ... }` and `.m-primary { ... }` as separate top-level rules. A modifier
+  never applies on its own (the component always renders both classes together — see
+  `packages/ui-components/src/components/button/button.tsx`), so the SCSS nesting should
+  say that directly instead of leaving the pairing implicit.
+- **A component's styles are its own.** Don't reach into another component's
+  `.module.scss` or write a selector targeting another component's `c-`/`m-` class from
+  outside that component's own file — CSS Modules' hashing already prevents accidental
+  collisions, but the `c-`/`m-` naming makes a deliberate cross-component override
+  obviously wrong in review, since a `.c-other-thing` rule has no reason to exist outside
+  `other-thing`'s own module.
+- Import the compiled module as `styles`. Hyphenated keys (anything using the `c-`/`m-`
+  convention above) aren't valid JS identifiers, so access them via bracket notation:
+  `styles['c-button']`, not `styles.c-button`.
+- Shared/global styles (resets, tokens, layout shells) can live outside any single
+  component's module, but anything component-specific stays in that component's own
+  `.module.scss`.
+- Enforced by `react/forbid-dom-props` (`eslint.config.mjs`, `apps/web/**` and
+  `packages/ui-components/**`) — it's an `error`, not a warning, so it blocks commits/CI.
+  Genuinely computed/dynamic styles are still possible via an explicit
+  `// eslint-disable-next-line react/forbid-dom-props` comment on that line — the point is
+  to make each exception visible in review, not to forbid inline styles outright.
+- `pnpm lint:styles` runs `stylelint` across every `.css`/`.scss` file in the repo (also
+  part of `pnpm lint` and `pnpm check`); `stylelint --fix` is wired into the Husky
+  pre-commit hook via `lint-staged` the same way ESLint/Prettier are.
 
 ## Barrel files
 
@@ -70,6 +112,34 @@ the bundler/type-checker to resolve and don't hide circular dependencies.
   `NODE_ENV=production`. Import order/grouping is auto-fixed by
   `eslint-plugin-simple-import-sort` — don't hand-arrange imports; run `pnpm lint:fix` and
   let it sort them.
+
+## Sharing types between apps (`packages/api-contract`)
+
+Any request/response shape that crosses the network boundary between `apps/web` and
+`apps/server` gets defined once, in `packages/api-contract`, as a Zod schema plus its
+`z.infer`'d type — never redefined separately on each side. `apps/server` parses its own
+outgoing responses through the schema (so a handler that drifts from its contract fails
+loudly instead of silently), and `apps/web` imports the same inferred type for whatever
+consumes that response (see `apps/web/src/lib/health-client.ts` and
+`apps/server/src/app.ts`'s `/health` route for the reference pair). Add a new contract as
+`packages/api-contract/src/<name>.ts`, re-export it from that package's `index.ts`.
+
+## Publishable common components (`packages/ui-components`)
+
+Components meant to be reusable outside this specific project (eventually published to a
+registry, not just consumed via the workspace) live in `packages/ui-components`, not
+`apps/web`. Because a published package can't assume anything about the app that installs
+it:
+
+- No `react-i18next`/`i18next` — text comes in via props/children only. No env vars either.
+  Both are hard `eslint.config.mjs` restrictions scoped to `packages/ui-components/**`
+  (`no-restricted-imports`, `no-restricted-properties`), not just convention.
+- `react`/`react-dom` are `peerDependencies`, not `dependencies` — the consuming app
+  supplies React.
+- Same one-directory-per-component + SCSS Modules + `c-`/`m-` convention as `apps/web`
+  (see above) — `src/components/button/` is the reference component.
+- `tsc -b` doesn't copy `.module.scss` into `dist/`; `scripts/copy-styles.mjs` (a
+  `fs.cpSync` copy, no bundler needed) runs as an extra `build` step for that reason.
 
 ## Error reporting
 

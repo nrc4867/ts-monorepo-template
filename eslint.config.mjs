@@ -67,11 +67,10 @@ export default tseslint.config(
     },
   },
   {
-    files: ['apps/web/**/*.{ts,tsx}'],
+    files: ['apps/web/**/*.{ts,tsx}', 'packages/ui-components/**/*.{ts,tsx}'],
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
-      i18next: i18nextPlugin,
       'jsx-a11y': jsxA11yPlugin,
     },
     rules: {
@@ -83,13 +82,60 @@ export default tseslint.config(
       // computed/dynamic styles are still possible via an explicit
       // `// eslint-disable-next-line react/forbid-dom-props` comment.
       'react/forbid-dom-props': ['error', { forbid: ['style'] }],
-      // No inline user-facing text — route it through react-i18next's t().
-      // Same escape hatch as forbid-dom-props: an explicit disable comment
-      // for the rare case (e.g. a hardcoded log-only label).
-      'i18next/no-literal-string': ['error', { mode: 'jsx-only' }],
     },
     settings: {
       react: { version: 'detect' },
+    },
+  },
+  {
+    // i18next only applies where apps/web actually initializes it — never in
+    // the publishable component package (see packages/ui-components' import
+    // restrictions below), and it's opt-in per-app rather than global.
+    files: ['apps/web/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.{ts,tsx}'],
+    plugins: {
+      i18next: i18nextPlugin,
+    },
+    rules: {
+      // No inline user-facing text — route it through react-i18next's t().
+      // Escape hatch: an explicit disable comment for the rare case (e.g. a
+      // hardcoded log-only label).
+      'i18next/no-literal-string': ['error', { mode: 'jsx-only' }],
+    },
+  },
+  {
+    // packages/ui-components must be usable by any consumer, so it can't
+    // assume react-i18next is configured or that particular env vars exist —
+    // see that package's README for the full rationale. Applies to tests too.
+    files: ['packages/ui-components/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { paths: [{ name: 'react-i18next' }, { name: 'i18next' }] },
+      ],
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'process',
+          property: 'env',
+          message: 'packages/ui-components must not read env vars — see its README.',
+        },
+      ],
+    },
+  },
+  {
+    // Same detector as apps/web's block above, repurposed: this package
+    // can't depend on i18next, but a hardcoded JSX label is still a bug here
+    // — it should have come in as a prop. Excludes tests, where literal
+    // strings are normal (`render(<Button>Click me</Button>)` isn't
+    // user-facing copy).
+    files: ['packages/ui-components/**/*.tsx'],
+    ignores: ['**/*.test.tsx'],
+    plugins: {
+      i18next: i18nextPlugin,
+    },
+    rules: {
+      'i18next/no-literal-string': ['error', { mode: 'jsx-only' }],
     },
   },
   {
