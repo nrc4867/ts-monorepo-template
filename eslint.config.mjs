@@ -16,6 +16,8 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/.turbo/**',
       '**/coverage/**',
+      // Plop templates — contain raw Handlebars syntax, not valid TS/JSON.
+      'turbo/generators/templates/**',
     ],
   },
   js.configs.recommended,

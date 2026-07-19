@@ -5,17 +5,20 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --concurrency 15",
-    "lint": "turbo run lint",
-    "lint:fix": "turbo run lint -- --fix",
-    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint && eslint vitest.config.ts turbo/generators/config.ts",
+    "lint:fix": "turbo run lint -- --fix && eslint --fix vitest.config.ts turbo/generators/config.ts",
+    "typecheck": "turbo run typecheck && tsc --noEmit -p turbo/generators/tsconfig.json",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
     "clean": "turbo run clean",
+    "gen": "turbo gen",
     "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@turbo/gen": "^2.10.5",
+    "@types/node": "^22.20.1",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-check-file": "^3.3.2",
