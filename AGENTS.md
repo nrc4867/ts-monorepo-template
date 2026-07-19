@@ -46,8 +46,8 @@ Every `src/` in this repo (every app, every package — no exceptions) puts test
 belong to, rather than colocating either one directly beside its source file:
 
 ```
-src/lib/health-client.ts
-src/lib/__specs__/health-client.test.ts
+src/service/health-client.ts
+src/service/__specs__/health-client.test.ts
 
 src/components/app/app.tsx
 src/components/app/__specs__/app.test.tsx
@@ -67,11 +67,13 @@ even linted), hence a small standalone script instead of a lint rule.
 ## Components and styling (React apps)
 
 - **One directory per component.** `src/components/<name>/` holds everything for that
-  component — the component itself, a thin barrel `index.ts` (`export * from
-'./<name>.js'`), and its `__specs__/`/`styles/` subdirectories per the layout rule above.
-  A component with distinct sub-parts can have its own further subdirectories under that
-  same directory — keep the whole thing self-contained rather than spreading pieces across
-  `src/`.
+  component — the component itself and its `__specs__/`/`styles/` subdirectories per the
+  layout rule above. No barrel `index.ts` here: nothing imports a component from outside
+  its own directory, so there's no package-boundary reason to add one — import
+  `./components/<name>/<name>.js` directly (see `packages/*/src/index.ts` below for where
+  a barrel _is_ load-bearing). A component with distinct sub-parts can have its own further
+  subdirectories under that same directory — keep the whole thing self-contained rather
+  than spreading pieces across `src/`.
 - No inline styles (`style={{...}}`) and no CSS-in-JS. Use **SCSS Modules** (`.module.scss`,
   not plain `.module.css` — `sass` is a devDependency of `apps/web` and any component
   package specifically so nesting/variables work).
@@ -109,9 +111,16 @@ even linted), hence a small standalone script instead of a lint rule.
 
 ## Barrel files
 
-Barrel files (`index.ts` re-exporting from a directory) are allowed and encouraged for
-clean import paths. Keep barrels thin: re-exports only, no logic, so they stay cheap for
-the bundler/type-checker to resolve and don't hide circular dependencies.
+`packages/*/src/index.ts` is a required barrel, not a style choice — each package's
+`package.json` points `main`/`types` at `dist/index.js`/`dist/index.d.ts`, so it's the
+actual module resolution entry point for anything importing `@project/<name>`. Keep it
+thin: re-exports only, no logic, so it stays cheap to resolve and doesn't hide circular
+dependencies.
+
+Don't add a barrel anywhere else "for consistency." A directory only needs one if
+something outside it needs a single import path into it — e.g. a package's public API.
+`src/components/<name>/` doesn't qualify (nothing imports a component from outside its
+own directory), which is why those don't have one — see "Components and styling" above.
 
 ## Logging and imports
 
@@ -132,7 +141,7 @@ Any request/response shape that crosses the network boundary between `apps/web` 
 `z.infer`'d type — never redefined separately on each side. `apps/server` parses its own
 outgoing responses through the schema (so a handler that drifts from its contract fails
 loudly instead of silently), and `apps/web` imports the same inferred type for whatever
-consumes that response (see `apps/web/src/lib/health-client.ts` and
+consumes that response (see `apps/web/src/service/health-client.ts` and
 `apps/server/src/app.ts`'s `/health` route for the reference pair). Add a new contract as
 `packages/api-contract/src/<name>.ts`, re-export it from that package's `index.ts`.
 
@@ -248,12 +257,20 @@ it.
   place; a file exceeds ~250-300 lines; a section has a distinct responsibility from the
   rest of the file; a value is hardcoded in more than one place (→ a constants file); a
   type/interface is used in more than one file (→ a types file).
-- Within a package or app's `src/`, group by responsibility as the need arises —
-  `components/`, `hooks/`, `lib/`, `constants/`, `types/` — rather than one flat directory
-  of files. Don't pre-create empty folders for these; add them when the first file that
-  belongs there shows up.
-- Search the existing `lib/`/`hooks/`/`utils` in that package before writing a new helper
-  — add to what's there instead of inlining a one-off in a feature file.
+- Within a package or app's `src/`, group by responsibility as the need arises rather than
+  one flat directory of files. Don't pre-create empty folders for these; add them when the
+  first file that belongs there shows up. This is guidance for picking a consistent name,
+  not an enforced rule (nothing lints directory names) — a couple of loosely-related files
+  aren't worth relocating over:
+  - `hooks/` — custom React hooks (`apps/web` and any component package).
+  - `service/` — modules that talk to an external API/webservice (see
+    `apps/web/src/service/health-client.ts` for the reference example).
+  - `utils/` — generic, pure helper functions with no external side effects (parsing,
+    formatting, that kind of thing).
+  - `constants/` / `types/` — shared constants and shared types, respectively.
+  - `lib/` — anything domain-specific that doesn't fit one of the more specific names above.
+- Search the existing `hooks/`/`service/`/`utils`/`lib/` in that package before writing a
+  new helper — add to what's there instead of inlining a one-off in a feature file.
 - No magic numbers or repeated string literals in logic — pull them into a constants file
   with named exports.
 - Don't extract an abstraction for a single use site "for later." Three similar lines is

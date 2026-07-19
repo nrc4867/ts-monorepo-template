@@ -14,10 +14,12 @@ app that installs it:
 - **`react`/`react-dom` are peer dependencies**, not regular dependencies — the consuming
   app supplies its own React, so this package never bundles a second copy.
 
-Each component gets its own directory under `src/components/<name>/` — component, barrel
-`index.ts`, a `__specs__/` subdirectory for its test, and a `styles/` subdirectory for its
-`.module.scss` — same convention as `apps/web` (see AGENTS.md's "Components and styling").
-Class names follow the repo-wide `c-`/`m-` convention (`stylelint.config.mjs`).
+Each component gets its own directory under `src/components/<name>/` — component, a
+`__specs__/` subdirectory for its test, and a `styles/` subdirectory for its `.module.scss`
+(no barrel `index.ts` per component; `src/index.ts` — this package's real, load-bearing
+barrel — re-exports each component directly) — same convention as `apps/web` (see
+AGENTS.md's "Components and styling"). Class names follow the repo-wide `c-`/`m-`
+convention (`stylelint.config.mjs`).
 
 `tsc -b` doesn't know what to do with `.module.scss` files, so `scripts/copy-styles.mjs`
 copies them into `dist/` after compilation as an extra `build` step — consumers resolve CSS

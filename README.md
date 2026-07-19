@@ -105,8 +105,9 @@ Every `src/` in this repo — every app, every package, not just `apps/web` — 
 belong to, rather than colocating either one directly beside its source (`pnpm
 lint:structure` enforces this). On top of that, `apps/web` and `packages/ui-components`
 also share a components convention: every component gets its own directory under
-`src/components/<name>/` — the component itself, a barrel `index.ts`, and those same
-`__specs__/`/`styles/` subdirectories. Classes are prefixed `c-` (component) or `m-`
+`src/components/<name>/` — the component itself and those same `__specs__/`/`styles/`
+subdirectories (no barrel `index.ts`; nothing imports a component from outside its own
+directory, so import `<name>.js` directly). Classes are prefixed `c-` (component) or `m-`
 (modifier), enforced by `stylelint` (`pnpm lint:styles`) so a cross-component style override
 is an obvious, lintable violation rather than something you'd only catch in review. See
 "Components and styling (React apps)" in `AGENTS.md` for the full rules, and
