@@ -23,6 +23,19 @@ Run from the repo root (Turbo fans these out to every workspace package):
 2. Add `{ "path": "packages/<name>" }` to the root `tsconfig.json` `references` array.
 3. Run `pnpm install` to link the new workspace member.
 
+## Filenames
+
+All `.ts`/`.tsx`/`.js`/`.jsx` filenames must be `kebab-case`, starting with a lowercase
+letter — including React component files (`base-converter.tsx`, not `BaseConverter.tsx`).
+Enforced by `eslint-plugin-check-file`'s `check-file/filename-naming-convention` rule in
+`eslint.config.mjs`.
+
+Exceptions (excluded from the rule in `eslint.config.mjs`): `*.config.{js,mjs,cjs,ts}`
+files (e.g. `vite.config.ts`, `postcss.config.mjs`) and framework-mandated files like
+`next-env.d.ts`. Non-code files (`README.md`, `LICENSE`, `CLAUDE.md`, `AGENTS.md`) aren't
+covered by the rule at all since it only targets code extensions. If a new framework
+forces another exception, add it to that `ignores` list rather than disabling the rule.
+
 ## Things to know before editing
 
 - TypeScript is strict, plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
