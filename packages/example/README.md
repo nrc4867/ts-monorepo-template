@@ -1,4 +1,4 @@
-# @template/example
+# @project/example
 
 Reference package demonstrating the expected shape of a package in this monorepo:
 `tsconfig.json` extending the shared base config, a `src/` entry point, and a colocated

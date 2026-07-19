@@ -1,4 +1,4 @@
-# @template/error-reporting
+# @project/error-reporting
 
 Vendor-agnostic error reporting. `reportError(error, context)` is the single call site
 every app should use — it currently just logs to `console.error`, but the whole point is

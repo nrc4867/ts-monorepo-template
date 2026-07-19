@@ -68,7 +68,7 @@ importers:
 
   apps/server:
     dependencies:
-      '@template/error-reporting':
+      '@project/error-reporting':
         specifier: workspace:*
         version: link:../../packages/error-reporting
       express:
@@ -99,7 +99,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@template/error-reporting':
+      '@project/error-reporting':
         specifier: workspace:*
         version: link:../../packages/error-reporting
       i18next:

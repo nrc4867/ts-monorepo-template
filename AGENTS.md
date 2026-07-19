@@ -66,7 +66,7 @@ the bundler/type-checker to resolve and don't hide circular dependencies.
 ## Error reporting
 
 Errors that reach an `ErrorBoundary` or a top-level catch should go through
-`reportError` from `@template/error-reporting` (`packages/error-reporting`) — never a raw
+`reportError` from `@project/error-reporting` (`packages/error-reporting`) — never a raw
 `console.error` at the call site, and never a global `console.error` override. The function
 currently just logs; swap its internals for a real backend per project without touching
 any caller. `apps/web`'s `error-boundary.tsx` is the reference usage — it calls

@@ -1,5 +1,5 @@
 {
-  "name": "@template/web",
+  "name": "@project/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@template/error-reporting": "workspace:*",
+    "@project/error-reporting": "workspace:*",
     "i18next": "^26.3.6",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",

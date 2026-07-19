@@ -1,4 +1,4 @@
-import { reportError } from '@template/error-reporting';
+import { reportError } from '@project/error-reporting';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
 interface ErrorBoundaryProps {

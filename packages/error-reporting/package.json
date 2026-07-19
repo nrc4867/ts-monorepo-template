@@ -1,5 +1,5 @@
 {
-  "name": "@template/error-reporting",
+  "name": "@project/error-reporting",
   "version": "0.0.0",
   "private": true,
   "type": "module",
