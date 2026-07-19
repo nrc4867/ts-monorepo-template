@@ -23,6 +23,18 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {
+    // typescript-eslint's own eslint-recommended override turns `no-undef`
+    // off, since type-aware linting already catches undefined identifiers —
+    // but that override only targets .ts/.tsx/.mts/.cts (see
+    // typescript-eslint/eslint-recommended's `files`), so plain Node scripts
+    // (.mjs) still need it disabled explicitly, or referencing `process`/
+    // `console` trips it despite full type info being available.
+    files: ['**/*.mjs'],
+    rules: {
+      'no-undef': 'off',
+    },
+  },
+  {
     languageOptions: {
       parserOptions: {
         projectService: {

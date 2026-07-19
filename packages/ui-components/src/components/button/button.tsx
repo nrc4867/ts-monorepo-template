@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-import styles from './style/button.module.scss';
+import { classNames } from '../../lib/class-names.js';
+import styles from './styles/button.module.scss';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -8,12 +9,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ children, variant = 'secondary', className, ...rest }: ButtonProps) {
-  const classNames = [styles['c-button'], styles[`m-${variant}`], className]
-    .filter(Boolean)
-    .join(' ');
-
   return (
-    <button className={classNames} {...rest}>
+    <button className={classNames(styles, 'c-button', `m-${variant}`, className)} {...rest}>
       {children}
     </button>
   );

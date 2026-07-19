@@ -101,8 +101,8 @@ as a starting point, or delete it once you've added real projects.
 
 `apps/web` and `packages/ui-components` share one convention: every component gets its own
 directory under `src/components/<name>/` — the component, a barrel `index.ts`, a
-`__specs__/` subdirectory for its test, and a `style/` subdirectory for its `.module.scss`.
-Classes are prefixed `c-` (component) or `m-`
+`__specs__/` subdirectory for its test, and a `styles/` subdirectory for its `.module.scss`
+(both enforced by `pnpm lint:structure`). Classes are prefixed `c-` (component) or `m-`
 (modifier), enforced by `stylelint` (`pnpm lint:styles`) so a cross-component style override
 is an obvious, lintable violation rather than something you'd only catch in review. See
 "Components and styling (React apps)" in `AGENTS.md` for the full rules, and

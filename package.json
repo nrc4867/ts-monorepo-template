@@ -5,9 +5,10 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --concurrency 15",
-    "lint": "turbo run lint && eslint vitest.config.ts turbo/generators/config.ts && pnpm lint:styles",
-    "lint:fix": "turbo run lint -- --fix && eslint --fix vitest.config.ts turbo/generators/config.ts && pnpm lint:styles -- --fix",
+    "lint": "turbo run lint && eslint vitest.config.ts turbo/generators/config.ts scripts/check-component-layout.mjs && pnpm lint:styles && pnpm lint:structure",
+    "lint:fix": "turbo run lint -- --fix && eslint --fix vitest.config.ts turbo/generators/config.ts scripts/check-component-layout.mjs && pnpm lint:styles -- --fix",
     "lint:styles": "stylelint '**/*.{css,scss}'",
+    "lint:structure": "node scripts/check-component-layout.mjs",
     "typecheck": "turbo run typecheck && tsc --noEmit -p turbo/generators/tsconfig.json",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -15,7 +15,7 @@ app that installs it:
   app supplies its own React, so this package never bundles a second copy.
 
 Each component gets its own directory under `src/components/<name>/` — component, barrel
-`index.ts`, a `__specs__/` subdirectory for its test, and a `style/` subdirectory for its
+`index.ts`, a `__specs__/` subdirectory for its test, and a `styles/` subdirectory for its
 `.module.scss` — same convention as `apps/web` (see AGENTS.md's "Components and styling").
 Class names follow the repo-wide `c-`/`m-` convention (`stylelint.config.mjs`).
 
@@ -25,4 +25,6 @@ Modules by filename convention (`*.module.scss`) the same way whether the file l
 `node_modules` or their own `src/`, so no compile step is needed here, only a copy.
 
 `src/components/button/` is a working reference component — copy its shape for the next
-one.
+one. `src/lib/class-names.ts` exports `classNames`, used by every component here (and by
+`apps/web`, which depends on this package for it) to resolve a `styles` object's classes —
+see its doc comment for the full API.

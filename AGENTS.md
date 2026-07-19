@@ -49,15 +49,17 @@ forces another exception, add it to that `ignores` list rather than disabling th
     index.ts            # export * from './<name>.js'
     __specs__/
       <name>.test.tsx
-    style/
+    styles/
       <name>.module.scss
   ```
   Tests live in a `__specs__/` subdirectory (not colocated next to the component file) and
-  styles live in a `style/` subdirectory, each imported with a relative path
-  (`./style/<name>.module.scss` from the component, `../<name>.js` from the test). A
+  styles live in a `styles/` subdirectory, each imported with a relative path
+  (`./styles/<name>.module.scss` from the component, `../<name>.js` from the test). A
   component with distinct sub-parts can have its own further subdirectories under that same
   directory — keep the whole thing self-contained rather than spreading pieces across
-  `src/`.
+  `src/`. **Enforced** by `scripts/check-component-layout.mjs` (`pnpm lint:structure`, part
+  of `pnpm lint`/`pnpm check`) — a `*.test.tsx` or `*.module.scss` anywhere under
+  `src/components/**` that isn't inside a `__specs__/`/`styles/` directory fails the build.
   This only applies to components (`src/components/**`) — plain modules elsewhere
   (`src/env.ts`, `src/lib/health-client.ts`, etc.) keep the simpler colocated
   `<name>.ts` + `<name>.test.ts` pattern used throughout the rest of the repo.
@@ -80,9 +82,10 @@ forces another exception, add it to that `ignores` list rather than disabling th
   collisions, but the `c-`/`m-` naming makes a deliberate cross-component override
   obviously wrong in review, since a `.c-other-thing` rule has no reason to exist outside
   `other-thing`'s own module.
-- Import the compiled module as `styles`. Hyphenated keys (anything using the `c-`/`m-`
-  convention above) aren't valid JS identifiers, so access them via bracket notation:
-  `styles['c-button']`, not `styles.c-button`.
+- Import the compiled module as `styles`, then resolve classes through `classNames` from
+  `@project/ui-components` (see its doc comment for the full API) rather than bracket
+  notation — `apps/web` depends on that package for exactly this reason, not just for its
+  components.
 - Shared/global styles (resets, tokens, layout shells) can live outside any single
   component's module, but anything component-specific stays in that component's own
   `.module.scss`.

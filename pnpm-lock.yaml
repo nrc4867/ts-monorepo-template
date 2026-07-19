@@ -129,6 +129,9 @@ importers:
       '@project/error-reporting':
         specifier: workspace:*
         version: link:../../packages/error-reporting
+      '@project/ui-components':
+        specifier: workspace:*
+        version: link:../../packages/ui-components
       i18next:
         specifier: ^26.3.6
         version: 26.3.6(typescript@7.0.2)
