@@ -52,7 +52,7 @@ pnpm --filter @project/server dev
 `apps/server/.env.example` to `apps/server/.env` to override defaults like `PORT` locally.
 `.env` is gitignored; `.env.example` is the checked-in reference for what's expected.
 
-**If `pnpm dev` fails with `Failed to resolve import "@project/error-reporting"`** (or any
+**If `pnpm dev` fails with `Failed to resolve import "@project/api-contract"`** (or any
 other workspace package): that package hasn't been built yet. `apps/web`/`apps/server`
 import workspace libraries via their `package.json` `main`/`types` fields, which point at
 `dist/` — Vite/Node can't resolve the import until that exists. Run `pnpm build` once

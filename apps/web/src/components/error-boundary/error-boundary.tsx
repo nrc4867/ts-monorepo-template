@@ -1,5 +1,6 @@
-import { reportError } from '@project/error-reporting';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+
+import { reportError } from '../../service/report-error.js';
 
 interface ErrorBoundaryProps {
   children: ReactNode;

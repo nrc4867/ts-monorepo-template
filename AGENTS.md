@@ -126,7 +126,7 @@ own directory), which is why those don't have one — see "Components and stylin
 
 - Everywhere except `apps/server`: `console.log`/`console.info`/`console.debug` are lint
   errors (`no-console`); `console.warn`/`console.error` are allowed (e.g.
-  `packages/error-reporting`'s intentional `console.error` stub).
+  `apps/web/src/service/report-error.ts`'s intentional `console.error` stub).
 - **`apps/server` specifically**: no `console.*` at all, not even `warn`/`error` — use
   `logger` from `src/logger.ts` (`pino`) instead. `logger.info`/`warn`/`error`/`debug` are
   all real, structured log levels; `pino-pretty` colorizes output outside
@@ -164,12 +164,20 @@ it:
 
 ## Error reporting
 
-Errors that reach an `ErrorBoundary` or a top-level catch should go through
-`reportError` from `@project/error-reporting` (`packages/error-reporting`) — never a raw
-`console.error` at the call site, and never a global `console.error` override. The function
-currently just logs; swap its internals for a real backend per project without touching
-any caller. `apps/web`'s `error-boundary.tsx` is the reference usage — it calls
+Errors that reach an `ErrorBoundary` or a top-level catch should go through `reportError`
+from `apps/web/src/service/report-error.ts` — never a raw `console.error` at the call site,
+and never a global `console.error` override. The function currently just logs; swap its
+internals for a real backend (Sentry, Bugsnag, your own endpoint) without touching any
+caller. `error-boundary.tsx` is the reference usage — it calls
 `reportError(error, { componentStack })` from `componentDidCatch`.
+
+This lives in `apps/web` itself rather than a workspace package: it has exactly one
+consumer (`apps/web`'s `ErrorBoundary`) and nothing crosses an app boundary, so a package
+would just be `package.json`/`tsconfig.json`/build-step ceremony around one function. If
+`apps/server` ever needs the same "single seam to swap the backend" property for its own
+errors, that's a separate concern — it already has `logger` (`src/logger.ts`, `pino`) for
+structured server-side logging, which isn't the same thing as reporting client-visible
+errors to an external service.
 
 ## Localization (React apps)
 
