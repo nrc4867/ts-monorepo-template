@@ -126,6 +126,15 @@ one, and it's the single source of truth for that app's config:
 - `apps/server/.env.example` documents every var the schema expects — keep it in sync
   when the schema changes. `.env` itself is gitignored.
 
+## Path aliases
+
+`@/*` maps to that app's own `src/*` in both `apps/web` and `apps/server` — configured in
+each app's `tsconfig.json`/`tsconfig.app.json`, plus `resolve.alias` in `apps/web`'s
+`vite.config.ts` and `tsc-alias` (a build-step rewrite) in `apps/server`, since a plain
+`tsc -b` build doesn't rewrite path aliases in its output and `apps/server` isn't bundled.
+Not mandatory for adjacent files in the same directory (`./env.js` is fine) — reach for
+`@/` when importing across subdirectories once an app grows past a flat `src/`.
+
 ## Code organization
 
 - One component, class, or logical module per file.

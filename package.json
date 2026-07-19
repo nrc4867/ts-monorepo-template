@@ -13,6 +13,7 @@
     "test": "vitest run",
     "clean": "turbo run clean",
     "gen": "turbo gen",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "prepare": "husky"
   },
   "devDependencies": {
