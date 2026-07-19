@@ -25,7 +25,8 @@ pnpm dev
   plus a `c-`/`m-` class-naming rule; see "Components and styling" below
 - **Husky + lint-staged** — pre-commit hook runs `eslint --fix` + `prettier --write` on staged files
 - **Vitest** (`vitest.config.ts`) — picks up `*.test.{ts,tsx}` under `apps/*/src` and
-  `packages/*/src`
+  `packages/*/src`; `pnpm test:coverage` reports coverage (no threshold enforced) and CI
+  posts it as a PR comment (`.github/workflows/ci.yml`)
 - **`.editorconfig`** / **`.gitattributes`** — consistent indentation and LF line endings
 - **`.nvmrc`** — pins Node 22 (pnpm 11 requires Node ≥ 22.13)
 

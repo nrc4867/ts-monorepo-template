@@ -10,5 +10,13 @@ export default defineConfig({
     // pass-through behavior in tests (see class-names.ts) and doesn't match
     // real bundler output, so process CSS for real instead of stubbing it.
     css: true,
+    coverage: {
+      provider: 'v8',
+      // No thresholds here on purpose — coverage is reported (see
+      // .github/workflows/ci.yml's PR comment step), not enforced as a gate.
+      include: ['apps/*/src/**', 'packages/*/src/**'],
+      exclude: ['**/__specs__/**', '**/*.d.ts'],
+      reporter: ['text', 'json-summary', 'json'],
+    },
   },
 });

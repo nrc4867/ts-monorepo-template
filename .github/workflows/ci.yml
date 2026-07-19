@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -24,4 +28,13 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build
-      - run: pnpm test
+      - run: pnpm test:coverage
+
+      # Posts/updates a sticky PR comment with a per-file coverage table
+      # (frontend + backend + every package, since pnpm test:coverage runs
+      # the one root Vitest config across the whole workspace). No threshold
+      # is configured anywhere (see vitest.config.ts) — this reports
+      # coverage, it doesn't gate on it.
+      - name: Report coverage
+        if: github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v2

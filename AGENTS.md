@@ -193,10 +193,15 @@ pay the jsdom startup cost.
 
 ## CI
 
-`.github/workflows/ci.yml` runs `format:check`, `lint`, `typecheck`, `build`, and `test` on
-every push to `main` and every PR. This is the actual gate — the local Husky pre-commit
-hook only catches issues before they're committed on a machine that has hooks installed;
-CI is what actually blocks a bad merge.
+`.github/workflows/ci.yml` runs `format:check`, `lint`, `typecheck`, `build`, and
+`test:coverage` on every push to `main` and every PR. This is the actual gate — the local
+Husky pre-commit hook only catches issues before they're committed on a machine that has
+hooks installed; CI is what actually blocks a bad merge.
+
+On PRs, `davelosert/vitest-coverage-report-action` posts/updates a sticky comment with a
+per-file coverage table from that same `test:coverage` run (frontend, backend, and every
+package — one root Vitest config covers all of them). There's no coverage threshold
+anywhere in `vitest.config.ts` — this is deliberately informational, not a merge gate.
 
 ## Environment variables
 
