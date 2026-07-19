@@ -14,3 +14,6 @@ If an app is a React app under `apps/web`, ESLint's React/hooks rules
 
 `web/` is a working Vite + React + TS reference app (build/typecheck/lint all pass) —
 copy it as a starting point for other apps, or edit it in place if you only need one.
+
+`server/` is a working Express + Zod backend, tested with `supertest` — copy it as a
+starting point for other services.
