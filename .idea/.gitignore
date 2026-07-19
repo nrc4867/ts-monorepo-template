@@ -1,0 +1,8 @@
+# Keep this folder minimal: only the settings that make IntelliJ defer to
+# Prettier/ESLint are tracked. Everything else IntelliJ generates per-project
+# (SDK config, module files, code style scheme, workspace state) is
+# machine/IDE-instance-specific and regenerates automatically on open.
+/*
+!/.gitignore
+!/prettier.xml
+!/jsLinters/
