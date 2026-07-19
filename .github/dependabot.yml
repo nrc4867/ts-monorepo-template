@@ -17,8 +17,12 @@ updates:
         update-types: ['version-update:semver-major']
       # eslint-plugin-react / eslint-plugin-jsx-a11y (both latest) only
       # support eslint ^9.x — ESLint 10 crashes react/display-name outright.
-      # Remove once those plugins catch up.
+      # @eslint/js is versioned in lockstep with eslint core (same blocker,
+      # separate npm package) — ignore both. Remove once those plugins
+      # catch up.
       - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@eslint/js'
         update-types: ['version-update:semver-major']
   - package-ecosystem: 'github-actions'
     directory: '/'
