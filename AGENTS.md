@@ -50,6 +50,19 @@ forces another exception, add it to that `ignores` list rather than disabling th
   comment on that line — the point is to make each exception visible in review, not to
   forbid inline styles outright.
 
+## Barrel files
+
+Barrel files (`index.ts` re-exporting from a directory) are allowed and encouraged for
+clean import paths. Keep barrels thin: re-exports only, no logic, so they stay cheap for
+the bundler/type-checker to resolve and don't hide circular dependencies.
+
+## Logging and imports
+
+- `console.log`/`console.info`/`console.debug` are lint errors (`no-console`).
+  `console.warn`/`console.error` are allowed.
+- Import order/grouping is auto-fixed by `eslint-plugin-simple-import-sort` — don't
+  hand-arrange imports; run `pnpm lint:fix` and let it sort them.
+
 ## Things to know before editing
 
 - TypeScript is strict, plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
