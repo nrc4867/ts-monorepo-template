@@ -4,5 +4,9 @@
     "noEmit": true
   },
   "include": ["vitest.config.ts"],
-  "references": [{ "path": "packages/example" }, { "path": "apps/web" }]
+  "references": [
+    { "path": "packages/example" },
+    { "path": "packages/error-reporting" },
+    { "path": "apps/web" }
+  ]
 }

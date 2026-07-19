@@ -63,6 +63,15 @@ the bundler/type-checker to resolve and don't hide circular dependencies.
 - Import order/grouping is auto-fixed by `eslint-plugin-simple-import-sort` — don't
   hand-arrange imports; run `pnpm lint:fix` and let it sort them.
 
+## Error reporting
+
+Errors that reach an `ErrorBoundary` or a top-level catch should go through
+`reportError` from `@template/error-reporting` (`packages/error-reporting`) — never a raw
+`console.error` at the call site, and never a global `console.error` override. The function
+currently just logs; swap its internals for a real backend per project without touching
+any caller. `apps/web`'s `error-boundary.tsx` is the reference usage — it calls
+`reportError(error, { componentStack })` from `componentDidCatch`.
+
 ## Things to know before editing
 
 - TypeScript is strict, plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
