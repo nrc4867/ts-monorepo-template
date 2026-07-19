@@ -86,6 +86,28 @@ i18next/no-literal-string` escape hatch applies for genuine exceptions (see
 - Adding a language: add `src/locales/<lang>.json` with the same keys as `en.json`, then
   register it in `src/i18n.ts`'s `resources` object.
 
+## Accessibility (React apps)
+
+`eslint-plugin-jsx-a11y`'s recommended rules are on for `apps/web/**` (missing `alt` text,
+invalid ARIA attributes, non-interactive elements with click handlers, etc.). These are
+real accessibility bugs, not style preferences — fix the markup rather than disabling the
+rule.
+
+## Testing (React apps)
+
+Component tests use `@testing-library/react` + `@testing-library/jest-dom` (see
+`app.test.tsx`) — query by role/text the way a user would, not by implementation detail.
+Vitest runs `apps/web/**` tests under the `jsdom` environment and everything else under
+plain `node` (`vitest.config.ts`'s `environmentMatchGlobs`) — package-level tests don't
+pay the jsdom startup cost.
+
+## CI
+
+`.github/workflows/ci.yml` runs `format:check`, `lint`, `typecheck`, `build`, and `test` on
+every push to `main` and every PR. This is the actual gate — the local Husky pre-commit
+hook only catches issues before they're committed on a machine that has hooks installed;
+CI is what actually blocks a bad merge.
+
 ## Code organization
 
 - One component, class, or logical module per file.

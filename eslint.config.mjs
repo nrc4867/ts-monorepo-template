@@ -4,6 +4,7 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import checkFilePlugin from 'eslint-plugin-check-file';
 import i18nextPlugin from 'eslint-plugin-i18next';
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import prettierConfig from 'eslint-config-prettier';
 
@@ -69,10 +70,12 @@ export default tseslint.config(
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       i18next: i18nextPlugin,
+      'jsx-a11y': jsxA11yPlugin,
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
       ...reactHooksPlugin.configs.recommended.rules,
+      ...jsxA11yPlugin.flatConfigs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       // No inline styles by default — use colocated CSS Modules. Genuine
       // computed/dynamic styles are still possible via an explicit
