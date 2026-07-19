@@ -1,0 +1,6 @@
+{
+  "app": {
+    "title": "ts-monorepo-template",
+    "description": "Edit src/app.tsx to get started."
+  }
+}

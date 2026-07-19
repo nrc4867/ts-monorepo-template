@@ -3,6 +3,7 @@ import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import checkFilePlugin from 'eslint-plugin-check-file';
+import i18nextPlugin from 'eslint-plugin-i18next';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import prettierConfig from 'eslint-config-prettier';
 
@@ -67,6 +68,7 @@ export default tseslint.config(
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
+      i18next: i18nextPlugin,
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
@@ -76,6 +78,10 @@ export default tseslint.config(
       // computed/dynamic styles are still possible via an explicit
       // `// eslint-disable-next-line react/forbid-dom-props` comment.
       'react/forbid-dom-props': ['error', { forbid: ['style'] }],
+      // No inline user-facing text — route it through react-i18next's t().
+      // Same escape hatch as forbid-dom-props: an explicit disable comment
+      // for the rare case (e.g. a hardcoded log-only label).
+      'i18next/no-literal-string': ['error', { mode: 'jsx-only' }],
     },
     settings: {
       react: { version: 'detect' },

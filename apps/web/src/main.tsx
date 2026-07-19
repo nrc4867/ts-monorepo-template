@@ -1,3 +1,5 @@
+import './i18n.js';
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 

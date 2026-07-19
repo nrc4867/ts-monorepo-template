@@ -23,6 +23,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   override render(): ReactNode {
     if (this.state.hasError) {
+      // Fallback for when rendering itself has already failed — deliberately
+      // not routed through i18next, which may be part of what broke.
+      // eslint-disable-next-line i18next/no-literal-string
       return this.props.fallback ?? <p>Something went wrong.</p>;
     }
     return this.props.children;

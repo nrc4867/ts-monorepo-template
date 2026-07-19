@@ -72,6 +72,38 @@ currently just logs; swap its internals for a real backend per project without t
 any caller. `apps/web`'s `error-boundary.tsx` is the reference usage — it calls
 `reportError(error, { componentStack })` from `componentDidCatch`.
 
+## Localization (React apps)
+
+- No hardcoded user-facing text in JSX. Use `react-i18next`'s `useTranslation()` and
+  `t('key')` — translation strings live in `src/locales/<lang>.json`, nested by feature
+  (e.g. `{"app": {"title": "..."}}`).
+- `src/i18n.ts` initializes `i18next` with the bundled locale JSON and must be imported
+  once, before anything renders — it's the first import in `main.tsx` for that reason.
+- Enforced by `i18next/no-literal-string` (`eslint.config.mjs`, `apps/web/**`, JSX-only
+  mode) — an `error`, not a warning. The same `// eslint-disable-next-line
+i18next/no-literal-string` escape hatch applies for genuine exceptions (see
+  `error-boundary.tsx`'s crash fallback, which deliberately avoids depending on i18next).
+- Adding a language: add `src/locales/<lang>.json` with the same keys as `en.json`, then
+  register it in `src/i18n.ts`'s `resources` object.
+
+## Code organization
+
+- One component, class, or logical module per file.
+- Extract into its own file when: a function is (or could be) used in more than one
+  place; a file exceeds ~250-300 lines; a section has a distinct responsibility from the
+  rest of the file; a value is hardcoded in more than one place (→ a constants file); a
+  type/interface is used in more than one file (→ a types file).
+- Within a package or app's `src/`, group by responsibility as the need arises —
+  `components/`, `hooks/`, `lib/`, `constants/`, `types/` — rather than one flat directory
+  of files. Don't pre-create empty folders for these; add them when the first file that
+  belongs there shows up.
+- Search the existing `lib/`/`hooks/`/`utils` in that package before writing a new helper
+  — add to what's there instead of inlining a one-off in a feature file.
+- No magic numbers or repeated string literals in logic — pull them into a constants file
+  with named exports.
+- Don't extract an abstraction for a single use site "for later." Three similar lines is
+  better than a premature shared helper with one caller.
+
 ## Things to know before editing
 
 - TypeScript is strict, plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
