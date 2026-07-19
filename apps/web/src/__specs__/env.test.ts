@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { env } from './env.js';
+import { env } from '../env.js';
 
 describe('env', () => {
   it('parses MODE from import.meta.env', () => {

@@ -97,12 +97,15 @@ client SDK, etc.), which you genuinely create more of over a project's life. Cop
 working reference projects (build/typecheck/lint/test all pass out of the box) — copy one
 as a starting point, or delete it once you've added real projects.
 
-## Components and styling
+## File layout, components, and styling
 
-`apps/web` and `packages/ui-components` share one convention: every component gets its own
-directory under `src/components/<name>/` — the component, a barrel `index.ts`, a
-`__specs__/` subdirectory for its test, and a `styles/` subdirectory for its `.module.scss`
-(both enforced by `pnpm lint:structure`). Classes are prefixed `c-` (component) or `m-`
+Every `src/` in this repo — every app, every package, not just `apps/web` — puts tests in a
+`__specs__/` subdirectory and stylesheets in a `styles/` subdirectory next to the file they
+belong to, rather than colocating either one directly beside its source (`pnpm
+lint:structure` enforces this). On top of that, `apps/web` and `packages/ui-components`
+also share a components convention: every component gets its own directory under
+`src/components/<name>/` — the component itself, a barrel `index.ts`, and those same
+`__specs__/`/`styles/` subdirectories. Classes are prefixed `c-` (component) or `m-`
 (modifier), enforced by `stylelint` (`pnpm lint:styles`) so a cross-component style override
 is an obvious, lintable violation rather than something you'd only catch in review. See
 "Components and styling (React apps)" in `AGENTS.md` for the full rules, and

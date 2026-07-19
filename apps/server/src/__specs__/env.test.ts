@@ -13,7 +13,7 @@ describe('env', () => {
 
   it('defaults PORT to 3000 when unset', async () => {
     delete process.env.PORT;
-    const { env } = await import('./env.js');
+    const { env } = await import('../env.js');
 
     expect(env.PORT).toBe(3000);
   });

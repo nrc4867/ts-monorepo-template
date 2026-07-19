@@ -1,18 +1,33 @@
-// Enforces the "Components and styling" convention from AGENTS.md: inside
-// any src/components/**, tests live under __specs__/ and stylesheets live
-// under styles/ — not colocated next to the component file. ESLint can't
+// Enforces the layout convention from AGENTS.md, uniformly across every
+// app/package's src/ (not just components): tests live under __specs__/ and
+// stylesheets live under styles/ — never colocated next to the file they
+// belong to. One rule, applied the same way everywhere, is the point — it's
+// what keeps any two packages easy to navigate the same way. ESLint can't
 // express "this file must be in that folder" for non-JS files (.scss isn't
 // even linted), so this is a small standalone check instead of an ESLint rule.
 import { readdirSync, statSync } from 'node:fs';
 import { relative } from 'node:path';
-
-const componentsRoots = ['apps/web/src/components', 'packages/ui-components/src/components'];
 
 /** @type {{ pattern: RegExp; expectedDir: string }[]} */
 const rules = [
   { pattern: /\.test\.tsx?$/, expectedDir: '__specs__' },
   { pattern: /\.module\.scss$/, expectedDir: 'styles' },
 ];
+
+/**
+ * @param {string} dir
+ * @returns {boolean}
+ */
+function isDirectory(dir) {
+  try {
+    return statSync(dir).isDirectory();
+  } catch (error) {
+    if (error !== null && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+      return false;
+    }
+    throw error;
+  }
+}
 
 /**
  * @param {string} dir
@@ -39,19 +54,20 @@ function walk(dir, violations) {
 /** @type {string[]} */
 const violations = [];
 
-for (const root of componentsRoots) {
-  try {
-    walk(root, violations);
-  } catch (error) {
-    const isMissingDirectory =
-      error !== null && typeof error === 'object' && 'code' in error && error.code === 'ENOENT';
-    if (!isMissingDirectory) {
-      throw error;
+for (const group of ['apps', 'packages']) {
+  if (!isDirectory(group)) {
+    continue;
+  }
+
+  for (const name of readdirSync(group)) {
+    const srcDir = `${group}/${name}/src`;
+    if (isDirectory(srcDir)) {
+      walk(srcDir, violations);
     }
   }
 }
 
 if (violations.length > 0) {
-  console.error(`Component layout violations:\n${violations.map((v) => `  - ${v}`).join('\n')}`);
+  console.error(`File layout violations:\n${violations.map((v) => `  - ${v}`).join('\n')}`);
   process.exit(1);
 }

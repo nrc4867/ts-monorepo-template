@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { logger } from './logger.js';
+import { logger } from '../logger.js';
 
 describe('logger', () => {
   it('exposes standard pino levels', () => {

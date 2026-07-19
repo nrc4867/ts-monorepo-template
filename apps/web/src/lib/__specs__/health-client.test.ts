@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchHealth } from './health-client.js';
+import { fetchHealth } from '../health-client.js';
 
 describe('fetchHealth', () => {
   afterEach(() => {

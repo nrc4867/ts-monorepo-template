@@ -1,7 +1,7 @@
 import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { reportError } from './report-error.js';
+import { reportError } from '../report-error.js';
 
 describe('reportError', () => {
   let consoleErrorSpy: MockInstance<typeof console.error>;

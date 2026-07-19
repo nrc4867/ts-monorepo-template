@@ -39,30 +39,39 @@ files (e.g. `vite.config.ts`, `postcss.config.mjs`) and framework-mandated files
 covered by the rule at all since it only targets code extensions. If a new framework
 forces another exception, add it to that `ignores` list rather than disabling the rule.
 
+## File layout: tests and styles
+
+Every `src/` in this repo (every app, every package — no exceptions) puts tests in a
+`__specs__/` subdirectory and stylesheets in a `styles/` subdirectory, next to the file they
+belong to, rather than colocating either one directly beside its source file:
+
+```
+src/lib/health-client.ts
+src/lib/__specs__/health-client.test.ts
+
+src/components/app/app.tsx
+src/components/app/__specs__/app.test.tsx
+src/components/app/styles/app.module.scss
+```
+
+Import with a relative path (`../health-client.js` from the test, `./styles/app.module.scss`
+from the component). This is a repo-wide, uniform rule, not a components-only special case
+— one convention, applied identically everywhere, is what keeps any two packages navigable
+the same way and makes a misplaced file an obvious mistake rather than a judgment call.
+**Enforced** by `scripts/check-file-layout.mjs` (`pnpm lint:structure`, part of `pnpm
+lint`/`pnpm check`), which walks every `apps/*/src` and `packages/*/src` and fails the build
+on any `*.test.ts(x)` or `*.module.scss` that isn't inside its required subdirectory —
+ESLint can't express "this file must live in that folder" for non-JS files (`.scss` isn't
+even linted), hence a small standalone script instead of a lint rule.
+
 ## Components and styling (React apps)
 
 - **One directory per component.** `src/components/<name>/` holds everything for that
-  component:
-  ```
-  src/components/<name>/
-    <name>.tsx
-    index.ts            # export * from './<name>.js'
-    __specs__/
-      <name>.test.tsx
-    styles/
-      <name>.module.scss
-  ```
-  Tests live in a `__specs__/` subdirectory (not colocated next to the component file) and
-  styles live in a `styles/` subdirectory, each imported with a relative path
-  (`./styles/<name>.module.scss` from the component, `../<name>.js` from the test). A
-  component with distinct sub-parts can have its own further subdirectories under that same
-  directory — keep the whole thing self-contained rather than spreading pieces across
-  `src/`. **Enforced** by `scripts/check-component-layout.mjs` (`pnpm lint:structure`, part
-  of `pnpm lint`/`pnpm check`) — a `*.test.tsx` or `*.module.scss` anywhere under
-  `src/components/**` that isn't inside a `__specs__/`/`styles/` directory fails the build.
-  This only applies to components (`src/components/**`) — plain modules elsewhere
-  (`src/env.ts`, `src/lib/health-client.ts`, etc.) keep the simpler colocated
-  `<name>.ts` + `<name>.test.ts` pattern used throughout the rest of the repo.
+  component — the component itself, a thin barrel `index.ts` (`export * from
+'./<name>.js'`), and its `__specs__/`/`styles/` subdirectories per the layout rule above.
+  A component with distinct sub-parts can have its own further subdirectories under that
+  same directory — keep the whole thing self-contained rather than spreading pieces across
+  `src/`.
 - No inline styles (`style={{...}}`) and no CSS-in-JS. Use **SCSS Modules** (`.module.scss`,
   not plain `.module.css` — `sass` is a devDependency of `apps/web` and any component
   package specifically so nesting/variables work).

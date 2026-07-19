@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { classNames } from './class-names.js';
+import { classNames } from '../class-names.js';
 
 const styles = {
   'c-button': '_c-button_hash',

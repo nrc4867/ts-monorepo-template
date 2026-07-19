@@ -5,5 +5,5 @@
     "allowJs": true,
     "types": ["node"]
   },
-  "include": ["check-component-layout.mjs"]
+  "include": ["check-file-layout.mjs"]
 }
