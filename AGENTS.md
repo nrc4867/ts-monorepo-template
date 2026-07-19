@@ -36,6 +36,20 @@ files (e.g. `vite.config.ts`, `postcss.config.mjs`) and framework-mandated files
 covered by the rule at all since it only targets code extensions. If a new framework
 forces another exception, add it to that `ignores` list rather than disabling the rule.
 
+## Styling (React apps)
+
+- No inline styles (`style={{...}}`) and no CSS-in-JS. Use **CSS Modules**, colocated with
+  the component: `component-name.tsx` + `component-name.module.css` in the same directory.
+- Import as `styles` and reference classes via `styles.foo` — e.g.
+  `import styles from './component-name.module.css'` then `<div className={styles.wrapper}>`.
+- Shared/global styles (resets, tokens, layout shells) can live outside a component's
+  module, but anything component-specific stays in that component's own `.module.css`.
+- Enforced by `react/forbid-dom-props` (`eslint.config.mjs`, `apps/web/**` only) — it's an
+  `error`, not a warning, so it blocks commits/CI. Genuinely computed/dynamic styles are
+  still possible via an explicit `// eslint-disable-next-line react/forbid-dom-props`
+  comment on that line — the point is to make each exception visible in review, not to
+  forbid inline styles outright.
+
 ## Things to know before editing
 
 - TypeScript is strict, plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,

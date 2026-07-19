@@ -59,6 +59,10 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       ...reactHooksPlugin.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
+      // No inline styles by default — use colocated CSS Modules. Genuine
+      // computed/dynamic styles are still possible via an explicit
+      // `// eslint-disable-next-line react/forbid-dom-props` comment.
+      'react/forbid-dom-props': ['error', { forbid: ['style'] }],
     },
     settings: {
       react: { version: 'detect' },
