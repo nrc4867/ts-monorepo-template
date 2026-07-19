@@ -23,7 +23,7 @@ pnpm dev
 - **Husky + lint-staged** — pre-commit hook runs `eslint --fix` + `prettier --write` on staged files
 - **Vitest** (`vitest.config.ts`) — picks up `*.test.ts` under `apps/*/src` and `packages/*/src`
 - **`.editorconfig`** / **`.gitattributes`** — consistent indentation and LF line endings
-- **`.nvmrc`** — pins Node 20
+- **`.nvmrc`** — pins Node 22 (pnpm 11 requires Node ≥ 22.13)
 
 ## Running the apps
 
