@@ -1,15 +1,16 @@
-import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import reactPlugin from 'eslint-plugin-react';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import reactRefreshPlugin from 'eslint-plugin-react-refresh';
-import checkFilePlugin from 'eslint-plugin-check-file';
-import i18nextPlugin from 'eslint-plugin-i18next';
-import importXPlugin from 'eslint-plugin-import-x';
-import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import vitestPlugin from '@vitest/eslint-plugin';
-import prettierConfig from 'eslint-config-prettier';
+import js from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import reactPlugin from 'eslint-plugin-react'
+import reactHooksPlugin from 'eslint-plugin-react-hooks'
+import reactRefreshPlugin from 'eslint-plugin-react-refresh'
+import checkFilePlugin from 'eslint-plugin-check-file'
+import i18nextPlugin from 'eslint-plugin-i18next'
+import importXPlugin from 'eslint-plugin-import-x'
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y'
+import noRelativeImportPathsPlugin from 'eslint-plugin-no-relative-import-paths'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import vitestPlugin from '@vitest/eslint-plugin'
+import prettierConfig from 'eslint-config-prettier'
 
 export default tseslint.config(
   {
@@ -226,5 +227,26 @@ export default tseslint.config(
       'import-x/no-cycle': 'error',
     },
   },
+  {
+    // apps/web and apps/server each configure a '@/*' -> './src/*' path
+    // alias (tsconfig, plus vite.config.ts/tsc-alias respectively) —
+    // packages/* don't have one, hence scoping this to apps/* only.
+    // `rootDir: 'src'` is resolved relative to ESLint's cwd at invocation
+    // time, which is each package's own directory when run the normal way
+    // (`pnpm lint`/`turbo run lint`, which fan out to each package's own
+    // `eslint .`) — so this one config resolves correctly for both apps
+    // without an app-specific absolute path. Autofixable: `pnpm lint:fix`
+    // rewrites violations to the alias form instead of just flagging them.
+    files: ['apps/web/**/*.{ts,tsx}', 'apps/server/**/*.ts'],
+    plugins: {
+      'no-relative-import-paths': noRelativeImportPathsPlugin,
+    },
+    rules: {
+      'no-relative-import-paths/no-relative-import-paths': [
+        'error',
+        { allowSameFolder: true, rootDir: 'src', prefix: '@' },
+      ],
+    },
+  },
   prettierConfig,
-);
+)

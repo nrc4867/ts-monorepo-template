@@ -1,14 +1,14 @@
-import './i18n.js';
+import './i18n.js'
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 
-import { App } from './components/app/app.js';
-import { ErrorBoundary } from './components/error-boundary/error-boundary.js';
+import { App } from './components/app/app.js'
+import { ErrorBoundary } from './components/error-boundary/error-boundary.js'
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById('root')
 if (!rootElement) {
-  throw new Error('Root element #root not found');
+  throw new Error('Root element #root not found')
 }
 
 createRoot(rootElement).render(
@@ -17,4 +17,4 @@ createRoot(rootElement).render(
       <App />
     </ErrorBoundary>
   </StrictMode>,
-);
+)

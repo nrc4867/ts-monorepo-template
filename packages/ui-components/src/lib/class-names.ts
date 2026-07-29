@@ -1,8 +1,8 @@
-type ClassKey<T> = (keyof T & string) | (string & Record<never, never>);
+type ClassKey<T> = (keyof T & string) | (string & Record<never, never>)
 
-type ClassMap<T> = Partial<Record<ClassKey<T>, boolean | null | undefined>>;
+type ClassMap<T> = Partial<Record<ClassKey<T>, boolean | null | undefined>>
 
-type ClassArg<T> = ClassKey<T> | ClassMap<T> | false | null | undefined;
+type ClassArg<T> = ClassKey<T> | ClassMap<T> | false | null | undefined
 
 /**
  * Joins classes for an element styled with a CSS Modules import. Each entry
@@ -28,22 +28,22 @@ export function classNames<T extends Record<string, string>>(
   styles: T,
   ...classes: ClassArg<T>[]
 ): string {
-  const resolved: string[] = [];
+  const resolved: string[] = []
 
   for (const entry of classes) {
     if (typeof entry === 'string' && entry.length > 0) {
-      resolved.push(styles[entry] ?? entry);
-      continue;
+      resolved.push(styles[entry] ?? entry)
+      continue
     }
 
     if (entry && typeof entry === 'object') {
       for (const [key, enabled] of Object.entries(entry)) {
         if (enabled) {
-          resolved.push(styles[key] ?? key);
+          resolved.push(styles[key] ?? key)
         }
       }
     }
   }
 
-  return resolved.join(' ');
+  return resolved.join(' ')
 }

@@ -48,12 +48,16 @@ one, and it's the single source of truth for that app's config:
 each app's `tsconfig.json`/`tsconfig.app.json`, plus `resolve.alias` in `apps/web`'s
 `vite.config.ts` and `tsc-alias` (a build-step rewrite) in `apps/server`, since a plain
 `tsc -b` build doesn't rewrite path aliases in its output and `apps/server` isn't bundled.
-Not mandatory for adjacent files in the same directory (`./env.js` is fine) — reach for
-`@/` when importing across subdirectories once an app grows past a flat `src/`.
+Same-directory imports (`./env.js`) are unaffected — `eslint-plugin-no-relative-import-paths`
+(`no-relative-import-paths/no-relative-import-paths`, scoped to `apps/web/**` and
+`apps/server/**` — `packages/*` don't have a `@/` alias) errors on any `../` parent-relative
+import and is autofixable: `pnpm lint:fix` rewrites it to `@/...` rather than just flagging it.
 
-The root `vitest.config.ts` repeats `apps/web`'s `@` alias in its own `resolve.alias`,
-since a root-level Vitest run doesn't go through any single app's `vite.config.ts` — if a
-test can't resolve a `@/...` import, check that alias is still there before assuming
+The root `vitest.config.ts` resolves `@/...` per-importer via a small custom Vite plugin
+(`perAppAtAlias`) rather than a plain `resolve.alias`, since a root-level Vitest run
+doesn't go through either app's own `vite.config.ts`, and a single `resolve.alias` entry
+can't point `@` at two different directories depending on which app the importing file
+belongs to. If a test can't resolve a `@/...` import, check that plugin before assuming
 anything else is wrong.
 
 ## Dependency version ceilings

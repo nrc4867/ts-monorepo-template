@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest'
 
-import { placeholder } from './index.js';
+import { placeholder } from './index.js'
 
 describe('{{name}}', () => {
   it('exists', () => {
-    expect(placeholder).toBe(true);
-  });
-});
+    expect(placeholder).toBe(true)
+  })
+})

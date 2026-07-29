@@ -5,14 +5,14 @@
 // what keeps any two packages easy to navigate the same way. ESLint can't
 // express "this file must be in that folder" for non-JS files (.scss isn't
 // even linted), so this is a small standalone check instead of an ESLint rule.
-import { readdirSync, statSync } from 'node:fs';
-import { relative } from 'node:path';
+import { readdirSync, statSync } from 'node:fs'
+import { relative } from 'node:path'
 
 /** @type {{ pattern: RegExp; expectedDir: string }[]} */
 const rules = [
   { pattern: /\.test\.tsx?$/, expectedDir: '__specs__' },
   { pattern: /\.module\.scss$/, expectedDir: 'styles' },
-];
+]
 
 /**
  * @param {string} dir
@@ -20,12 +20,12 @@ const rules = [
  */
 function isDirectory(dir) {
   try {
-    return statSync(dir).isDirectory();
+    return statSync(dir).isDirectory()
   } catch (error) {
     if (error !== null && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
-      return false;
+      return false
     }
-    throw error;
+    throw error
   }
 }
 
@@ -35,39 +35,39 @@ function isDirectory(dir) {
  */
 function walk(dir, violations) {
   for (const entry of readdirSync(dir)) {
-    const fullPath = `${dir}/${entry}`;
+    const fullPath = `${dir}/${entry}`
     if (statSync(fullPath).isDirectory()) {
-      walk(fullPath, violations);
-      continue;
+      walk(fullPath, violations)
+      continue
     }
 
     for (const { pattern, expectedDir } of rules) {
       if (pattern.test(entry) && !fullPath.split('/').includes(expectedDir)) {
         violations.push(
           `${relative(process.cwd(), fullPath)} must be inside a "${expectedDir}/" directory`,
-        );
+        )
       }
     }
   }
 }
 
 /** @type {string[]} */
-const violations = [];
+const violations = []
 
 for (const group of ['apps', 'packages']) {
   if (!isDirectory(group)) {
-    continue;
+    continue
   }
 
   for (const name of readdirSync(group)) {
-    const srcDir = `${group}/${name}/src`;
+    const srcDir = `${group}/${name}/src`
     if (isDirectory(srcDir)) {
-      walk(srcDir, violations);
+      walk(srcDir, violations)
     }
   }
 }
 
 if (violations.length > 0) {
-  console.error(`File layout violations:\n${violations.map((v) => `  - ${v}`).join('\n')}`);
-  process.exit(1);
+  console.error(`File layout violations:\n${violations.map((v) => `  - ${v}`).join('\n')}`)
+  process.exit(1)
 }

@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest'
 
-import { logger } from '../logger.js';
+import { logger } from '@/logger.js'
 
 describe('logger', () => {
   it('exposes standard pino levels', () => {
-    expect(logger.info).toBeTypeOf('function');
-    expect(logger.warn).toBeTypeOf('function');
-    expect(logger.error).toBeTypeOf('function');
-  });
-});
+    expect(logger.info).toBeTypeOf('function')
+    expect(logger.warn).toBeTypeOf('function')
+    expect(logger.error).toBeTypeOf('function')
+  })
+})

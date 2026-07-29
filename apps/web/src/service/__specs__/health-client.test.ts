@@ -1,25 +1,25 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { fetchHealth } from '../health-client.js';
+import { fetchHealth } from '@/service/health-client.js'
 
 function jsonResponse(body: unknown): Response {
-  return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
+  return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } })
 }
 
 describe('fetchHealth', () => {
   afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+    vi.unstubAllGlobals()
+  })
 
   it('parses the server response through the shared api-contract schema', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })))
 
-    await expect(fetchHealth()).resolves.toEqual({ status: 'ok' });
-  });
+    await expect(fetchHealth()).resolves.toEqual({ status: 'ok' })
+  })
 
   it('rejects a response that violates the shared schema', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'down' })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'down' })))
 
-    await expect(fetchHealth()).rejects.toThrow();
-  });
-});
+    await expect(fetchHealth()).rejects.toThrow()
+  })
+})

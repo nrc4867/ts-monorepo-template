@@ -1,5 +1,5 @@
 export interface ErrorContext {
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 /**
@@ -8,5 +8,5 @@ export interface ErrorContext {
  * your own endpoint) per project — everything that calls this stays the same.
  */
 export function reportError(error: unknown, context?: ErrorContext): void {
-  console.error(error, context);
+  console.error(error, context)
 }
