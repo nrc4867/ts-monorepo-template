@@ -26,6 +26,13 @@ endpoint follows this same three-file shape.
    what they'd expect; `RPCHandler` is batched-RPC-shaped and not REST). The object keys
    used to merge routes are purely organizational — they shape the generated client's
    call sites, not the URL — so adding a route never changes another route's path.
+
+   Test a route in isolation with `createTestRouterApp` (`apps/server/src/test-utils/
+create-test-router-app.ts`), which wraps a single router in a bare Express app the
+   same way `app.ts` wraps the full one — see `routes/health/__specs__/health.test.ts`
+   for the reference usage. Use `createApp()` (`@/app.js`) instead when a test needs the
+   full app (multiple routes, `/spec.json`, error handling) rather than one route.
+
 3. **Consume it** from `apps/web/src/service/<name>-client.ts` via
    `createApiClient(contract)` (`apps/web/src/service/api-client.ts` — the one place that
    wires up `OpenAPILink`/`createORPCClient`/the base URL; don't hand-roll another
@@ -45,6 +52,17 @@ live, always-accurate OpenAPI document — wire up a `GET /spec.json` route (see
 `apps/server/src/app.ts`) using `@orpc/openapi`'s `OpenAPIGenerator` against the same
 implemented router. It's generated from the real contract every time, so it can't drift
 from the actual API the way a hand-maintained Swagger file can.
+
+## Error handling
+
+Throw `ORPCError` (from `@orpc/server`, re-exported from `@orpc/client`) inside a route's
+`handler()` for any expected/typed failure — `throw new ORPCError('NOT_FOUND', { message:
+'Widget not found' })`. oRPC maps common codes to their HTTP status automatically
+(`BAD_REQUEST` → 400, `UNAUTHORIZED` → 401, `FORBIDDEN` → 403, `NOT_FOUND` → 404,
+`CONFLICT` → 409, ...) and serializes every error — including an uncaught plain `Error`,
+which becomes a generic 500 — into the same consistent JSON shape
+(`{ defined, code, status, message, data }`), without leaking internal error details for
+undefined errors.
 
 ## Database access (once a project adds a database)
 

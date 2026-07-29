@@ -16,6 +16,10 @@ Run from the repo root (Turbo fans these out to every workspace package):
 - `pnpm lint` / `pnpm lint:fix` — ESLint (flat config, `typescript-eslint` strictTypeChecked)
 - `pnpm format` / `pnpm format:check` — Prettier
 - `pnpm test` — Vitest, run once from the root (not per-package)
+- `pnpm check` — the full CI gate (format:check, lint, typecheck, build, test), runnable
+  locally before pushing
+- `pnpm check:fast` — the same gate minus `build`, for quicker local/agent iteration (see
+  `docs/tooling.md`'s "CI" section) — not a substitute for `pnpm check` before pushing
 - `pnpm dev` — long-running dev tasks across packages
 
 ## Further reading
@@ -41,3 +45,6 @@ the task at hand rather than all of them:
 - [`docs/tooling.md`](docs/tooling.md) — logging conventions, CI, environment variables,
   path aliases, dependency version ceilings, and other things worth knowing before
   editing.
+- [`docs/new-project-reminders.md`](docs/new-project-reminders.md) — decisions a new
+  project cloned from this template should make explicitly early on (auth, database,
+  rate limiting, deployment topology, and more) rather than leaving implicit.

@@ -17,6 +17,7 @@
     "clean": "turbo run clean",
     "gen": "turbo gen",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm build && pnpm test",
+    "check:fast": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
     "prepare": "husky"
   },
   "devDependencies": {

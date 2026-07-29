@@ -3,6 +3,7 @@ import { OpenAPIHandler } from '@orpc/openapi/node'
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4'
 import express, { type Express } from 'express'
 
+import { errorHandler } from './errors/error-handler.js'
 import { healthRouter } from './routes/health/health.js'
 
 // Object keys here are purely organizational (they shape the generated
@@ -39,6 +40,11 @@ export function createApp(): Express {
       })
       .catch(next)
   })
+
+  // Only reachable from routes/middleware above that aren't oRPC-implemented
+  // (e.g. /spec.json) — see errors/error-handler.ts for why oRPC's own
+  // routes never hit this.
+  app.use(errorHandler)
 
   return app
 }

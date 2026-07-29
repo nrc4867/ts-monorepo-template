@@ -19,6 +19,13 @@
 Husky pre-commit hook only catches issues before they're committed on a machine that has
 hooks installed; CI is what actually blocks a bad merge.
 
+`pnpm check` (the same four steps plus `test`) is that same gate, runnable locally before
+pushing. `pnpm check:fast` drops the `build` step — format, lint, typecheck, and test
+alone — for quicker local/agent iteration; typecheck already catches most of what a build
+would (a `tsc -b` build with no bundler-only errors), so build is the one step worth
+skipping mid-task. Still run the full `pnpm check` before pushing — `check:fast` is a
+faster loop, not a replacement gate.
+
 On PRs, `davelosert/vitest-coverage-report-action` posts/updates a sticky comment with a
 per-file coverage table from that same `test:coverage` run (frontend, backend, and every
 package — one root Vitest config covers all of them). There's no coverage threshold
