@@ -38,7 +38,7 @@ pnpm dev
 
 Runs every app's `dev` script concurrently via Turborepo: `apps/web` on
 [http://localhost:5173](http://localhost:5173) (Vite) and `apps/server` on
-[http://localhost:3000](http://localhost:3000) (`tsx watch`, no build step). Check
+[http://localhost:3000](http://localhost:3000) (`node --watch`, no build step). Check
 `apps/server`'s `GET /health` at <http://localhost:3000/health> to confirm it's up.
 
 To run just one:
