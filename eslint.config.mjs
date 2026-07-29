@@ -2,10 +2,13 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import reactRefreshPlugin from 'eslint-plugin-react-refresh';
 import checkFilePlugin from 'eslint-plugin-check-file';
 import i18nextPlugin from 'eslint-plugin-i18next';
+import importXPlugin from 'eslint-plugin-import-x';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import vitestPlugin from '@vitest/eslint-plugin';
 import prettierConfig from 'eslint-config-prettier';
 
 export default tseslint.config(
@@ -55,6 +58,18 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      // strictTypeChecked's default rejects ANY non-string type in a
+      // template literal, including numbers/booleans, which always
+      // stringify exactly as expected (`` `${count}` ``) and can never
+      // produce the "[object Object]"-style bug this rule exists to catch.
+      // Loosen it to allow those two primitive cases explicitly rather than
+      // requiring a `.toString()` on every interpolated number/boolean; it
+      // still flags objects, arrays, and anything with a custom/unsafe
+      // `toString`.
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        { allowNumber: true, allowBoolean: true },
+      ],
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
@@ -84,6 +99,7 @@ export default tseslint.config(
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       'jsx-a11y': jsxA11yPlugin,
+      'react-refresh': reactRefreshPlugin,
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
@@ -94,6 +110,14 @@ export default tseslint.config(
       // computed/dynamic styles are still possible via an explicit
       // `// eslint-disable-next-line react/forbid-dom-props` comment.
       'react/forbid-dom-props': ['error', { forbid: ['style'] }],
+      // Exporting a non-component (a constant, a hook, a type) from the same
+      // file as a component silently breaks Vite's Fast Refresh — no error,
+      // the file just falls back to a full reload on every edit. 'warn', not
+      // 'error': it's a dev-experience footgun, not a correctness bug, so it
+      // shouldn't block a build. allowConstantExport covers the common
+      // pattern of a context file exporting both a component and its
+      // `const FooContext = createContext(...)`.
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
     settings: {
       react: { version: 'detect' },
@@ -110,9 +134,15 @@ export default tseslint.config(
     },
     rules: {
       // No inline user-facing text — route it through react-i18next's t().
-      // Escape hatch: an explicit disable comment for the rare case (e.g. a
-      // hardcoded log-only label).
-      'i18next/no-literal-string': ['error', { mode: 'jsx-only' }],
+      // mode: 'jsx-text-only' (not 'jsx-only') means this only checks text
+      // nodes between JSX tags, not every JSX attribute value — 'jsx-only'
+      // also flagged prop values that are never shown to a user (style
+      // shorthand like c="dimmed", route paths, enum-like values such as
+      // value="document"), which in practice produced far more noise than
+      // signal and had to be worked around with extracted constants or
+      // disable comments on every such prop. Escape hatch for genuine
+      // hardcoded text: an explicit disable comment (e.g. a log-only label).
+      'i18next/no-literal-string': ['error', { mode: 'jsx-text-only' }],
     },
   },
   {
@@ -147,7 +177,7 @@ export default tseslint.config(
       i18next: i18nextPlugin,
     },
     rules: {
-      'i18next/no-literal-string': ['error', { mode: 'jsx-only' }],
+      'i18next/no-literal-string': ['error', { mode: 'jsx-text-only' }],
     },
   },
   {
@@ -156,6 +186,44 @@ export default tseslint.config(
       // No console.* at all here (not even warn/error) — apps/server has a
       // real logger (src/logger.ts, pino); use that instead.
       'no-console': 'error',
+    },
+  },
+  {
+    // Test-structure lint, not type-aware — catches mistakes the type
+    // checker can't: a committed `.only`/`.skip` that silently disables the
+    // rest of a suite in CI, a `describe`/`it` with no assertions, a
+    // duplicated test title, etc.
+    files: ['apps/*/src/**/*.test.{ts,tsx}', 'packages/*/src/**/*.test.{ts,tsx}'],
+    plugins: {
+      vitest: vitestPlugin,
+    },
+    rules: {
+      ...vitestPlugin.configs.recommended.rules,
+      // recommended leaves this at 'warn'; a skipped test is exactly as
+      // silent a CI gap as a focused one (already 'error' above), so treat
+      // it the same.
+      'vitest/no-disabled-tests': 'error',
+    },
+  },
+  {
+    // TS project references already make a *cross-package* import cycle a
+    // hard `tsc -b` build failure, but that check doesn't look inside a
+    // single package — two files importing each other within the same
+    // src/ compiles fine and can still blow up at runtime ("cannot access X
+    // before initialization") or silently import a partially-evaluated
+    // module, depending on evaluation order. This is the intra-package
+    // check import-x/no-cycle exists for. It's a whole-import-graph
+    // traversal per file, so it's one of the slower rules here — worth
+    // watching if a package's src/ grows a lot.
+    files: ['apps/*/src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}'],
+    plugins: {
+      'import-x': importXPlugin,
+    },
+    settings: {
+      ...importXPlugin.flatConfigs.typescript.settings,
+    },
+    rules: {
+      'import-x/no-cycle': 'error',
     },
   },
   prettierConfig,
