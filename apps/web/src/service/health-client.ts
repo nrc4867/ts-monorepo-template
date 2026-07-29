@@ -1,8 +1,9 @@
-import { type HealthResponse, healthResponseSchema } from '@project/api-contract';
+import { healthContract, type HealthResponse } from '@project/api-contract';
 
-import { env } from '../env.js';
+import { createApiClient } from './api-client.js';
 
-export async function fetchHealth(): Promise<HealthResponse> {
-  const response = await fetch(`${env.VITE_API_URL}/health`);
-  return healthResponseSchema.parse(await response.json());
+const client = createApiClient(healthContract);
+
+export function fetchHealth(): Promise<HealthResponse> {
+  return client();
 }

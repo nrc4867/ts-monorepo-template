@@ -12,6 +12,9 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
+    "@orpc/openapi": "^1.14.12",
+    "@orpc/server": "^1.14.12",
+    "@orpc/zod": "^1.14.12",
     "@project/api-contract": "workspace:*",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

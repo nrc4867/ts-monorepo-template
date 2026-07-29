@@ -11,6 +11,9 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
+    "@orpc/client": "^1.14.12",
+    "@orpc/contract": "^1.14.12",
+    "@orpc/openapi-client": "^1.14.12",
     "@project/api-contract": "workspace:*",
     "@project/ui-components": "workspace:*",
     "i18next": "^26.3.6",
