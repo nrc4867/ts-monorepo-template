@@ -12,8 +12,8 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@orpc/contract": "^1.14.12",
-    "zod": "^4.4.3"
+    "@orpc/contract": "^1.15.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "rimraf": "^6.1.3"
